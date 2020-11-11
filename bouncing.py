@@ -7,7 +7,7 @@ HEIGHT = 700
 
 tk = Tk()
 canvas = Canvas(tk, width=WIDTH, height=HEIGHT)
-tk.title("Balls breaking the walls")
+tk.title("Bouncing balls")
 canvas.pack()
 
 BALL_SIZE = 35
@@ -27,17 +27,10 @@ class Ball:
     def move(self):
         canvas.move(self.shape, self.xspeed, self.yspeed)
         pos = canvas.coords(self.shape)
-        if pos[3] >= HEIGHT:
-            self.shape = canvas.create_oval(pos[0], 0, pos[2], BALL_SIZE, fill=self.color)
-        if pos[1] <= 0:
-            canvas.delete(self.shape)
-            self.shape = canvas.create_oval(pos[0], HEIGHT, pos[2], HEIGHT - BALL_SIZE, fill=self.color)
-        if pos[2] >= WIDTH:
-            canvas.delete(self.shape)
-            self.shape = canvas.create_oval(0, pos[1], BALL_SIZE, pos[3], fill=self.color)
-        if pos[0] <= 0:
-            canvas.delete(self.shape)
-            self.shape = canvas.create_oval(WIDTH, pos[1], WIDTH - BALL_SIZE, pos[3], fill=self.color)
+        if pos[3] >= HEIGHT or pos[1] <= 0:
+            self.yspeed = -self.yspeed
+        if pos[2] >= WIDTH or pos[0] <= 0:
+            self.xspeed = -self.xspeed
 
 
 BALL_SIZE = 35
