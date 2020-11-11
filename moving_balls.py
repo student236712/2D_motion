@@ -26,16 +26,16 @@ class Ball:
         pos = canvas.coords(self.shape)
         if pos[3] >= HEIGHT:
             canvas.delete(self.shape)
-            self.shape = canvas.create_oval(pos[0], 0, pos[2], BALL_SIZE, fill=self.color)
+            self.shape = canvas.create_oval(pos[0], 0, pos[2], self.size, fill=self.color)
         if pos[1] <= 0:
             canvas.delete(self.shape)
-            self.shape = canvas.create_oval(pos[0], HEIGHT, pos[2], HEIGHT - BALL_SIZE, fill=self.color)
+            self.shape = canvas.create_oval(pos[0], HEIGHT, pos[2], HEIGHT - self.size, fill=self.color)
         if pos[2] >= WIDTH:
             canvas.delete(self.shape)
-            self.shape = canvas.create_oval(0, pos[1], BALL_SIZE, pos[3], fill=self.color)
+            self.shape = canvas.create_oval(0, pos[1], self.size, pos[3], fill=self.color)
         if pos[0] <= 0:
             canvas.delete(self.shape)
-            self.shape = canvas.create_oval(WIDTH, pos[1], WIDTH - BALL_SIZE, pos[3], fill=self.color)
+            self.shape = canvas.create_oval(WIDTH, pos[1], WIDTH - self.size, pos[3], fill=self.color)
 
     def move_with_bouncing(self):
         canvas.move(self.shape, self.xspeed, self.yspeed)
@@ -92,7 +92,7 @@ balls.append(
     Ball(random.randrange(0, WIDTH - BALL_SIZE), random.randrange(0, HEIGHT - BALL_SIZE), "grey", BALL_SIZE))
 while True:
     for ball in balls:
-        ball.move_with_collision()
+        ball.move_with_breaking_walls()
 
     tk.update()
     time.sleep(0.01)
