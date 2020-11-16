@@ -8,9 +8,11 @@ WIDTH = 1200
 HEIGHT = 1000
 
 root = tk.Tk()
+
 canvas = Canvas(root, width=WIDTH, height=HEIGHT)
 root.title("Balls 2D motion")
 canvas.pack()
+balls = []
 
 
 class Ball:
@@ -51,18 +53,15 @@ class Ball:
         pos = canvas.coords(self.shape)
         for ball in balls:
             first_ball_x_centre = (canvas.coords(ball.shape)[0] + canvas.coords(ball.shape)[2]) / 2
+            first_ball_y_centre = (canvas.coords(ball.shape)[1] + canvas.coords(ball.shape)[3]) / 2
+            second_ball_x_centre = (canvas.coords(self.shape)[0] + canvas.coords(self.shape)[2]) / 2
+            second_ball_y_centre = (canvas.coords(self.shape)[1] + canvas.coords(self.shape)[3]) / 2
             distance_between_balls_centres = np.sqrt(
                 np.power(
-                    (canvas.coords(self.shape)[0] + canvas.coords(self.shape)[2]) / 2 - (canvas.coords(ball.shape)[0] +
-                                                                                         canvas.coords(ball.shape)[
-                                                                                             2]) / 2,
-                    2) + np.power(
-                    (canvas.coords(self.shape)[1] + canvas.coords(self.shape)[3]) / 2 - (canvas.coords(ball.shape)[1] +
-                                                                                         canvas.coords(ball.shape)[
-                                                                                             3]) / 2,
-                    2))
+                    (first_ball_x_centre - second_ball_x_centre), 2) + np.power(
+                    first_ball_y_centre - second_ball_y_centre, 2))
 
-            if ball != self and distance_between_balls_centres <= ((ball.size + self.size) / 2):
+            if ball != self and distance_between_balls_centres <= (ball.size / 2 + self.size / 2):
                 two_balls_size = self.size + ball.size
                 x_speed_after_collision = (self.xspeed * self.size + ball.xspeed * ball.size) / two_balls_size
                 y_speed_after_collision = (self.yspeed * self.size + ball.yspeed * ball.size) / two_balls_size
@@ -70,9 +69,10 @@ class Ball:
                 balls.remove(ball)
                 canvas.delete(self.shape)
                 self.size = two_balls_size
-                self.shape = canvas.create_oval((pos[0] + pos[2]) / 2, (pos[1] + pos[3]) / 2,
-                                                (pos[0] + pos[2]) / 2 + two_balls_size,
-                                                (pos[1] + pos[3]) / 2 + two_balls_size,
+                self.shape = canvas.create_oval((first_ball_x_centre + second_ball_x_centre) / 2 - two_balls_size / 2,
+                                                (first_ball_y_centre + second_ball_y_centre) / 2 - two_balls_size / 2,
+                                                (first_ball_x_centre + second_ball_x_centre) / 2 + two_balls_size / 2,
+                                                (first_ball_y_centre + second_ball_y_centre) / 2 + two_balls_size / 2,
                                                 fill=COLORS[random.randrange(0, len(COLORS))])
                 self.xspeed = x_speed_after_collision
                 self.yspeed = y_speed_after_collision
@@ -159,19 +159,28 @@ COLORS = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'ol
           'gray75', 'gray76', 'gray77', 'gray78', 'gray79', 'gray80', 'gray81', 'gray82', 'gray83',
           'gray84', 'gray85', 'gray86', 'gray87', 'gray88', 'gray89', 'gray90', 'gray91', 'gray92',
           'gray93', 'gray94', 'gray95', 'gray97', 'gray98', 'gray99']
-BALL_SIZE = int(input("Balls size:"))
-balls_amount = int(input("Balls amount:"))
 
-balls = []
-for i in range(0, balls_amount):
-    balls.append(Ball(random.randrange(0, WIDTH - BALL_SIZE), random.randrange(0, HEIGHT - BALL_SIZE),
-                      COLORS[random.randrange(0, len(COLORS))],
-                      BALL_SIZE))
 
-while True:
-    for ball in balls:
-        ball.move_with_collision()
+def show_animation(ball_size, balls_amount, balls_behaviour, balls_behaviour_variants):
+    BALL_SIZE = int(ball_size)
+    balls_amount = int(balls_amount)
 
-    root.update()
-    time.sleep(0.01)
-root.mainloop()
+    for i in range(0, balls_amount):
+        balls.append(Ball(random.randrange(0, WIDTH - BALL_SIZE), random.randrange(0, HEIGHT - BALL_SIZE),
+                          COLORS[random.randrange(0, len(COLORS))],
+                          BALL_SIZE))
+    while True:
+        for ball in balls:
+            if balls_behaviour == balls_behaviour_variants[0]:
+                ball.move_with_bouncing()
+            elif balls_behaviour == balls_behaviour_variants[1]:
+                ball.move_with_breaking_walls()
+            else:
+                ball.move_with_collision()
+        root.update()
+        time.sleep(0.01)
+    root.mainloop()
+
+
+def close():
+    root.destroy()
